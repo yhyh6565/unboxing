@@ -26,7 +26,7 @@ const HowToPlay = () => {
     {
       icon: PartyPopper,
       title: '4. 언박싱 파티!',
-      description: '모임에서 다 같이 선물 상자를 열며 답변을 공개해요!',
+      description: '모임에서 다 같이 선물 상자를 열며 답변을 공개해요! 끝나면 PDF로 추억 저장 가능!',
     },
   ];
 

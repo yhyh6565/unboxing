@@ -5,11 +5,10 @@ import { Gift, Users, Sparkles, HelpCircle, FileText } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import SnowEffect from '@/components/SnowEffect';
 import { generateResultsPDF } from '@/lib/pdf-generator';
-import { FullRoom, AnswerData } from '@/lib/supabase-storage';
 import { toast } from 'sonner';
 
 // Demo data for PDF preview
-const createDemoData = (): { room: FullRoom; answersByParticipant: Record<string, AnswerData[]> } => {
+const createDemoData = () => {
   const roomId = 'demo-room-id';
   const questions = [
     { id: 'q1', room_id: roomId, text: '올해 가장 기억에 남는 순간은?', order_index: 0, is_custom: false },
@@ -17,7 +16,7 @@ const createDemoData = (): { room: FullRoom; answersByParticipant: Record<string
     { id: 'q3', room_id: roomId, text: '내년에 꼭 이루고 싶은 목표는?', order_index: 2, is_custom: false },
   ];
 
-  const answers: AnswerData[] = [
+  const answers = [
     { id: 'a1', room_id: roomId, question_id: 'q1', author_nickname: '민수', text: '친구들과 함께한 제주도 여행! 바다에서 수영하고 맛있는 흑돼지도 먹고 정말 행복했어요 🌊', is_revealed: true },
     { id: 'a2', room_id: roomId, question_id: 'q1', author_nickname: '지영', text: '첫 해외여행으로 일본 오사카에 다녀왔어요. 도톤보리에서 먹은 타코야키 맛을 잊을 수가 없네요!', is_revealed: true },
     { id: 'a3', room_id: roomId, question_id: 'q1', author_nickname: '현우', text: '드디어 운전면허 땄다!! 6번만에 성공 ㅋㅋㅋ 포기하지 않길 잘했어', is_revealed: true },
@@ -174,6 +173,15 @@ const Landing = () => {
             {isGeneratingDemo ? 'PDF 생성 중...' : 'PDF 결과물 미리보기'}
           </button>
         </motion.div>
+        
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.48 }}
+          className="text-xs text-muted-foreground mb-6 text-center"
+        >
+          📄 파티가 끝나도 추억은 PDF로 영원히! 언박싱 결과를 저장해서 나중에 다시 꺼내보세요 ✨
+        </motion.p>
 
         {/* Action Buttons */}
         <motion.div
