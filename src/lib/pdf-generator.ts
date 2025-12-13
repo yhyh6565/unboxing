@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-interface RoomForPDF {
+export interface PDFRoomData {
   name: string;
   theme: string;
   created_at: string;
@@ -9,7 +9,7 @@ interface RoomForPDF {
   answers: Array<{ question_id: string; text: string; author_nickname: string }>;
 }
 
-interface AnswerForPDF {
+export interface PDFAnswerData {
   question_id: string;
   text: string;
   author_nickname: string;
@@ -39,14 +39,13 @@ const getColors = (theme: string) => {
 };
 
 export const generateResultsPDF = async (
-  room: RoomForPDF,
-  answersByParticipant: Record<string, AnswerForPDF[]>
+  room: PDFRoomData,
+  answersByParticipant: Record<string, PDFAnswerData[]>
 ): Promise<void> => {
   const c = getColors(room.theme);
   const participants = Object.keys(answersByParticipant);
   const themeText = room.theme === 'horse' ? '🐴 2026 붉은 말' : '🎄 크리스마스';
   
-  // Build questions HTML
   let qHtml = '';
   room.questions.forEach((q, i) => {
     const qAnswers = room.answers.filter(a => a.question_id === q.id);
@@ -67,7 +66,6 @@ export const generateResultsPDF = async (
     </div>`;
   });
 
-  // Build participants HTML
   let pHtml = '';
   Object.entries(answersByParticipant).forEach(([name, answers]) => {
     let paHtml = '';
@@ -111,7 +109,7 @@ export const generateResultsPDF = async (
   `;
 
   const container = document.createElement('div');
-  container.style.cssText = `position:fixed;left:-9999px;top:0;width:800px;font-family:'Galmuri9','Malgun Gothic',sans-serif;background:${c.bg};color:${c.text};padding:40px;box-sizing:border-box;`;
+  container.style.cssText = `position:fixed;left:-9999px;top:0;width:800px;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:${c.bg};color:${c.text};padding:40px;box-sizing:border-box;`;
   container.innerHTML = html;
   document.body.appendChild(container);
 
@@ -145,7 +143,8 @@ export const generateResultsPDF = async (
       left -= pdfH;
     }
     
-    pdf.save(`${room.name.replace(/[^a-zA-Z0-9가-힣]/g, '_')}_결과.pdf`);
+    const fileName = room.name.replace(/[^a-zA-Z0-9가-힣]/g, '_') + '_결과.pdf';
+    pdf.save(fileName);
   } finally {
     document.body.removeChild(container);
   }
