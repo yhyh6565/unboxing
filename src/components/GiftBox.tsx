@@ -7,7 +7,8 @@ interface GiftBoxProps {
   theme: Theme;
   isRevealed: boolean;
   answerText: string;
-  authorName: string;
+  authorName?: string;
+  showAuthor?: boolean;
   onClick: () => void;
   index: number;
 }
@@ -17,6 +18,7 @@ const GiftBox = ({
   isRevealed,
   answerText,
   authorName,
+  showAuthor = true,
   onClick,
   index,
 }: GiftBoxProps) => {
@@ -117,9 +119,11 @@ const GiftBox = ({
               <div className="text-sm text-foreground mb-4 leading-relaxed">
                 "{answerText}"
               </div>
-              <div className="border-t border-border pt-3 mt-3">
-                <span className="text-xs text-accent">— {authorName}</span>
-              </div>
+              {showAuthor && authorName && (
+                <div className="border-t border-border pt-3 mt-3">
+                  <span className="text-xs text-accent">— {authorName}</span>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
