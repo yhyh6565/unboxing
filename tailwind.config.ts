@@ -15,6 +15,9 @@ export default {
     extend: {
       fontFamily: {
         pixel: ['"Press Start 2P"', 'cursive'],
+        galmuri: ['"Galmuri9"', 'sans-serif'],
+        neodgm: ['"NeoDungGeunMo"', 'cursive'],
+        dnf: ['"DNFBitBitv2"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

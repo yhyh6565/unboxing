@@ -1,5 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* Korean Pixel Fonts */
+@import url('https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css');
+@import url('https://cdn.jsdelivr.net/gh/neodgm/neodgm-webfont@latest/neodgm/style.css');
+
+@font-face {
+  font-family: 'DNFBitBitv2';
+  src: url('//cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf') format('opentype');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -93,7 +102,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Press Start 2P', cursive;
+    font-family: 'Galmuri9', 'Press Start 2P', sans-serif;
     image-rendering: pixelated;
   }
 }
