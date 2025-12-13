@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, User, MessageSquare } from 'lucide-react';
+import { ArrowLeft, User, MessageSquare, Download } from 'lucide-react';
 import SnowEffect from '@/components/SnowEffect';
 import { getRoomById, getAnswersByParticipant, FullRoom, AnswerData } from '@/lib/supabase-storage';
+import { generateResultsPDF } from '@/lib/pdf-generator';
 import { toast } from 'sonner';
-
 const Results = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -13,6 +13,22 @@ const Results = () => {
   const [answersByParticipant, setAnswersByParticipant] = useState<Record<string, AnswerData[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [selectedParticipant, setSelectedParticipant] = useState<string | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    if (!room) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      await generateResultsPDF(room, answersByParticipant);
+      toast.success('PDF 다운로드 완료!');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('PDF 생성에 실패했어요');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
 
   useEffect(() => {
     const loadData = async () => {
@@ -78,9 +94,21 @@ const Results = () => {
           <h1 className="font-dnf text-2xl sm:text-3xl text-foreground pixel-text-shadow">
             {room.name} - 최종 결과
           </h1>
-          <p className="text-sm text-muted-foreground mt-2">
-            참여자별 답변 모아보기
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-2">
+            <p className="text-sm text-muted-foreground">
+              참여자별 답변 모아보기
+            </p>
+            {participants.length > 0 && (
+              <button
+                onClick={handleDownloadPDF}
+                disabled={isGeneratingPDF}
+                className="pixel-btn flex items-center gap-2 text-xs py-2 px-4 disabled:opacity-50"
+              >
+                <Download className="w-4 h-4" />
+                {isGeneratingPDF ? '생성 중...' : 'PDF 다운로드'}
+              </button>
+            )}
+          </div>
         </motion.div>
 
         {participants.length === 0 ? (
