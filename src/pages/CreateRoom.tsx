@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Copy, Check, Share2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Copy, Check, Share2, Minus } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import PixelInput from '@/components/PixelInput';
 import ThemeSelector from '@/components/ThemeSelector';
@@ -269,14 +269,12 @@ const CreateRoom = () => {
                     <span className="font-pixel text-[10px] text-foreground flex-1">
                       {q.text}
                     </span>
-                    {q.isCustom && (
-                      <button
-                        onClick={() => removeQuestion(q.id)}
-                        className="text-destructive hover:text-destructive/80"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
+                    <button
+                      onClick={() => removeQuestion(q.id)}
+                      className={q.isCustom ? "text-destructive hover:text-destructive/80" : "text-muted-foreground hover:text-foreground"}
+                    >
+                      {q.isCustom ? <Trash2 className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+                    </button>
                   </motion.div>
                 ))}
               </div>
