@@ -8,6 +8,7 @@ import CreateRoom from "./pages/CreateRoom";
 import JoinRoom from "./pages/JoinRoom";
 import AnswerSubmission from "./pages/AnswerSubmission";
 import HostView from "./pages/HostView";
+import Results from "./pages/Results";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/join" element={<JoinRoom />} />
           <Route path="/answer/:code" element={<AnswerSubmission />} />
           <Route path="/host/:id" element={<HostView />} />
+          <Route path="/results/:id" element={<Results />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

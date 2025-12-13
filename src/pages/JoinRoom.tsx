@@ -4,34 +4,38 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, LogIn } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import PixelInput from '@/components/PixelInput';
-import { getRoomByCode, saveParticipant } from '@/lib/storage';
+import { getRoomByCode } from '@/lib/supabase-storage';
+import { saveParticipant } from '@/lib/storage';
 import { toast } from 'sonner';
 
 const JoinRoom = () => {
   const navigate = useNavigate();
   const [roomCode, setRoomCode] = useState('');
   const [nickname, setNickname] = useState('');
+  const [isJoining, setIsJoining] = useState(false);
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (!roomCode.trim()) {
-      toast.error('Please enter a room code');
+      toast.error('방 코드를 입력해주세요');
       return;
     }
 
     if (!nickname.trim()) {
-      toast.error('Please enter your nickname');
+      toast.error('닉네임을 입력해주세요');
       return;
     }
 
-    const room = getRoomByCode(roomCode.toUpperCase());
+    setIsJoining(true);
+    const room = await getRoomByCode(roomCode.toUpperCase());
+    setIsJoining(false);
     
     if (!room) {
-      toast.error('Room not found. Check the code and try again.');
+      toast.error('방을 찾을 수 없어요. 코드를 확인해주세요.');
       return;
     }
 
     if (room.status !== 'collecting') {
-      toast.error('This room is no longer accepting answers');
+      toast.error('이 방은 더 이상 답변을 받지 않아요');
       return;
     }
 
@@ -55,7 +59,7 @@ const JoinRoom = () => {
           className="flex items-center gap-2 font-pixel text-[10px] text-muted-foreground hover:text-foreground mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          뒤로
         </motion.button>
 
         <div className="max-w-md mx-auto">
@@ -64,7 +68,7 @@ const JoinRoom = () => {
             animate={{ y: 0, opacity: 1 }}
             className="font-pixel text-2xl text-foreground pixel-text-shadow mb-8 text-center"
           >
-            Join Room
+            방 참여하기
           </motion.h1>
 
           <motion.div
@@ -75,7 +79,7 @@ const JoinRoom = () => {
           >
             <div>
               <PixelInput
-                label="Room Code"
+                label="방 코드"
                 placeholder="ABCD12"
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
@@ -86,13 +90,13 @@ const JoinRoom = () => {
 
             <div>
               <PixelInput
-                label="Your Nickname"
-                placeholder="Anonymous Hero"
+                label="닉네임"
+                placeholder="익명의 영웅"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
               />
               <p className="font-pixel text-[8px] text-muted-foreground mt-2">
-                This will be revealed when your answers are unboxed!
+                이 이름은 답변 공개 시 함께 보여져요!
               </p>
             </div>
 
@@ -100,11 +104,12 @@ const JoinRoom = () => {
               variant="primary"
               size="lg"
               onClick={handleJoin}
+              disabled={isJoining}
               className="w-full"
             >
               <span className="flex items-center justify-center gap-2">
                 <LogIn className="w-4 h-4" />
-                Enter Room
+                {isJoining ? '참여 중...' : '입장하기'}
               </span>
             </PixelButton>
           </motion.div>
@@ -117,7 +122,7 @@ const JoinRoom = () => {
             className="mt-8 text-center"
           >
             <p className="font-pixel text-[8px] text-muted-foreground">
-              Ask the host for the room code 🎁
+              방 코드는 주최자에게 물어보세요 🎁
             </p>
           </motion.div>
         </div>

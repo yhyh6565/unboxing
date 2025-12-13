@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, Trash2, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Copy, Check, Share2 } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import PixelInput from '@/components/PixelInput';
 import ThemeSelector from '@/components/ThemeSelector';
-import { Theme, Question, Room, DEFAULT_QUESTIONS } from '@/types/game';
-import { saveRoom, generateRoomCode, generateId } from '@/lib/storage';
+import { Theme, Question, DEFAULT_QUESTIONS } from '@/types/game';
+import { createRoom, FullRoom } from '@/lib/supabase-storage';
 import { toast } from 'sonner';
+
+const generateId = () => Math.random().toString(36).substring(2, 15);
 
 const CreateRoom = () => {
   const navigate = useNavigate();
@@ -18,8 +20,9 @@ const CreateRoom = () => {
     DEFAULT_QUESTIONS.map(q => ({ ...q, id: generateId() }))
   );
   const [customQuestion, setCustomQuestion] = useState('');
-  const [createdRoom, setCreatedRoom] = useState<Room | null>(null);
+  const [createdRoom, setCreatedRoom] = useState<FullRoom | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   const addCustomQuestion = () => {
     if (customQuestion.trim()) {
@@ -35,33 +38,34 @@ const CreateRoom = () => {
     setQuestions(questions.filter(q => q.id !== id));
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!roomName.trim()) {
-      toast.error('Please enter a room name');
+      toast.error('방 이름을 입력해주세요');
       return;
     }
 
     if (questions.length === 0) {
-      toast.error('Please add at least one question');
+      toast.error('최소 하나의 질문이 필요해요');
       return;
     }
 
-    const room: Room = {
-      id: generateId(),
-      name: roomName.trim(),
-      code: generateRoomCode(),
+    setIsCreating(true);
+    
+    const room = await createRoom(
+      roomName.trim(),
       theme,
       participantCount,
-      questions,
-      answers: [],
-      status: 'collecting',
-      currentQuestionIndex: 0,
-      createdAt: Date.now(),
-    };
+      questions.map(q => ({ text: q.text, isCustom: q.isCustom }))
+    );
 
-    saveRoom(room);
-    setCreatedRoom(room);
-    toast.success('Room created successfully!');
+    setIsCreating(false);
+
+    if (room) {
+      setCreatedRoom(room);
+      toast.success('방이 생성되었어요!');
+    } else {
+      toast.error('방 생성에 실패했어요. 다시 시도해주세요.');
+    }
   };
 
   const copyCode = () => {
@@ -69,7 +73,34 @@ const CreateRoom = () => {
       navigator.clipboard.writeText(createdRoom.code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast.success('Code copied!');
+      toast.success('코드가 복사되었어요!');
+    }
+  };
+
+  const getSurveyLink = () => {
+    return `${window.location.origin}/answer/${createdRoom?.code}`;
+  };
+
+  const copyLink = () => {
+    if (createdRoom) {
+      navigator.clipboard.writeText(getSurveyLink());
+      toast.success('설문 링크가 복사되었어요!');
+    }
+  };
+
+  const shareLink = async () => {
+    if (createdRoom && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${createdRoom.name} - 언박스 어스`,
+          text: '올해의 이야기를 함께 나눠요! 아래 링크에서 답변해주세요.',
+          url: getSurveyLink(),
+        });
+      } catch (err) {
+        copyLink();
+      }
+    } else {
+      copyLink();
     }
   };
 
@@ -82,10 +113,10 @@ const CreateRoom = () => {
             animate={{ scale: 1 }}
             className="pixel-card max-w-md w-full text-center"
           >
-            <h2 className="font-pixel text-xl text-accent mb-6">Room Created!</h2>
+            <h2 className="font-pixel text-xl text-accent mb-6">방이 생성되었어요!</h2>
             
             <div className="mb-6">
-              <p className="font-pixel text-[10px] text-muted-foreground mb-2">Room Code</p>
+              <p className="font-pixel text-[10px] text-muted-foreground mb-2">방 코드</p>
               <div className="flex items-center justify-center gap-3">
                 <span className="font-pixel text-3xl text-foreground tracking-widest">
                   {createdRoom.code}
@@ -103,8 +134,28 @@ const CreateRoom = () => {
               </div>
             </div>
 
+            {/* 설문 링크 공유 */}
+            <div className="mb-6 p-4 bg-muted">
+              <p className="font-pixel text-[10px] text-muted-foreground mb-3">
+                아래 링크를 모임원들에게 공유하세요!
+              </p>
+              <div className="font-pixel text-[8px] text-accent break-all mb-3 p-2 bg-background">
+                {getSurveyLink()}
+              </div>
+              <PixelButton
+                variant="accent"
+                onClick={shareLink}
+                className="w-full"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <Share2 className="w-4 h-4" />
+                  설문 링크 공유하기
+                </span>
+              </PixelButton>
+            </div>
+
             <p className="font-pixel text-[10px] text-muted-foreground mb-6">
-              Share this code with your friends!
+              모임원들이 링크를 통해 바로 답변할 수 있어요!
             </p>
 
             <div className="flex flex-col gap-3">
@@ -112,13 +163,13 @@ const CreateRoom = () => {
                 variant="primary"
                 onClick={() => navigate(`/host/${createdRoom.id}`)}
               >
-                Start Hosting
+                호스팅 시작하기
               </PixelButton>
               <PixelButton
                 variant="secondary"
                 onClick={() => navigate('/')}
               >
-                Back to Home
+                홈으로 돌아가기
               </PixelButton>
             </div>
           </motion.div>
@@ -138,7 +189,7 @@ const CreateRoom = () => {
           className="flex items-center gap-2 font-pixel text-[10px] text-muted-foreground hover:text-foreground mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          뒤로
         </motion.button>
 
         <div className="max-w-2xl mx-auto">
@@ -147,7 +198,7 @@ const CreateRoom = () => {
             animate={{ y: 0, opacity: 1 }}
             className="font-pixel text-2xl text-foreground pixel-text-shadow mb-8 text-center"
           >
-            Create Room
+            방 만들기
           </motion.h1>
 
           <motion.div
@@ -159,8 +210,8 @@ const CreateRoom = () => {
             {/* Room Name */}
             <div className="pixel-card">
               <PixelInput
-                label="Room Name"
-                placeholder="My Year-End Party"
+                label="방 이름"
+                placeholder="우리의 연말 파티"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
               />
@@ -169,7 +220,7 @@ const CreateRoom = () => {
             {/* Participant Count */}
             <div className="pixel-card">
               <label className="block text-[10px] font-pixel text-muted-foreground mb-2 uppercase">
-                Expected Participants
+                예상 참여자 수
               </label>
               <div className="flex items-center gap-4">
                 <button
@@ -193,7 +244,7 @@ const CreateRoom = () => {
             {/* Theme Selection */}
             <div className="pixel-card">
               <label className="block text-[10px] font-pixel text-muted-foreground mb-4 uppercase">
-                Theme
+                테마
               </label>
               <ThemeSelector value={theme} onChange={setTheme} />
             </div>
@@ -201,7 +252,7 @@ const CreateRoom = () => {
             {/* Questions */}
             <div className="pixel-card">
               <label className="block text-[10px] font-pixel text-muted-foreground mb-4 uppercase">
-                Questions ({questions.length})
+                질문 목록 ({questions.length}개)
               </label>
               
               <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
@@ -233,7 +284,7 @@ const CreateRoom = () => {
               {/* Add custom question */}
               <div className="flex gap-2">
                 <PixelInput
-                  placeholder="Add custom question..."
+                  placeholder="나만의 질문 추가..."
                   value={customQuestion}
                   onChange={(e) => setCustomQuestion(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addCustomQuestion()}
@@ -253,9 +304,10 @@ const CreateRoom = () => {
               variant="primary"
               size="lg"
               onClick={handleCreate}
+              disabled={isCreating}
               className="w-full"
             >
-              Create Room
+              {isCreating ? '생성 중...' : '방 만들기'}
             </PixelButton>
           </motion.div>
         </div>

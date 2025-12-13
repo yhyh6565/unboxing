@@ -34,10 +34,10 @@ export interface Participant {
 }
 
 export const DEFAULT_QUESTIONS: Omit<Question, 'id'>[] = [
-  { text: "What was your most frequent thought in 2025?", isCustom: false },
-  { text: "One new thing you learned about yourself this year?", isCustom: false },
-  { text: "Where did you spend the most money this year?", isCustom: false },
-  { text: "Where did you spend the most time this year?", isCustom: false },
-  { text: "What/Who did you pour the most emotion into?", isCustom: false },
-  { text: "A trivial skill you acquired this year?", isCustom: false },
+  { text: "2025년에 가장 자주 했던 생각은?", isCustom: false },
+  { text: "올해 나 자신에 대해 새롭게 알게 된 것은?", isCustom: false },
+  { text: "올해 가장 돈을 많이 쓴 곳은?", isCustom: false },
+  { text: "올해 가장 시간을 많이 쓴 곳은?", isCustom: false },
+  { text: "올해 가장 감정을 쏟은 대상은?", isCustom: false },
+  { text: "올해 습득한 사소한 기술 하나?", isCustom: false },
 ];

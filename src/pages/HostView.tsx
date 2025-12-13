@@ -1,68 +1,110 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Copy, Check, Play, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, Check, Play, RotateCcw, Share2, BarChart3 } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import GiftBox from '@/components/GiftBox';
 import SnowEffect from '@/components/SnowEffect';
-import { getRoomById, saveRoom, revealAnswer } from '@/lib/storage';
-import { Room, Answer } from '@/types/game';
+import { getRoomById, updateRoomStatus, revealAnswer, subscribeToAnswers, FullRoom, AnswerData } from '@/lib/supabase-storage';
 import { toast } from 'sonner';
 
 const HostView = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const [room, setRoom] = useState<Room | null>(null);
+  const [room, setRoom] = useState<FullRoom | null>(null);
   const [copied, setCopied] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      const foundRoom = getRoomById(id);
-      if (foundRoom) {
-        setRoom(foundRoom);
-        setCurrentQuestionIndex(foundRoom.currentQuestionIndex);
-      } else {
-        toast.error('Room not found');
-        navigate('/');
+    const loadRoom = async () => {
+      if (id) {
+        const foundRoom = await getRoomById(id);
+        if (foundRoom) {
+          setRoom(foundRoom);
+          setCurrentQuestionIndex(foundRoom.current_question_index);
+        } else {
+          toast.error('방을 찾을 수 없어요');
+          navigate('/');
+        }
       }
-    }
+      setIsLoading(false);
+    };
+
+    loadRoom();
   }, [id, navigate]);
 
-  const refreshRoom = () => {
+  // Subscribe to realtime answer updates
+  useEffect(() => {
+    if (!room?.id) return;
+
+    const unsubscribe = subscribeToAnswers(room.id, (newAnswers: AnswerData[]) => {
+      setRoom(prev => prev ? { ...prev, answers: newAnswers } : null);
+    });
+
+    return unsubscribe;
+  }, [room?.id]);
+
+  const refreshRoom = async () => {
     if (id) {
-      const updated = getRoomById(id);
+      const updated = await getRoomById(id);
       if (updated) setRoom(updated);
     }
   };
-
-  useEffect(() => {
-    const interval = setInterval(refreshRoom, 2000);
-    return () => clearInterval(interval);
-  }, [id]);
 
   const copyCode = () => {
     if (room) {
       navigator.clipboard.writeText(room.code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      toast.success('Code copied!');
+      toast.success('코드가 복사되었어요!');
     }
   };
 
-  const startUnboxing = () => {
-    if (room) {
-      room.status = 'unboxing';
-      saveRoom(room);
-      setRoom({ ...room });
-      toast.success("Let's unbox!");
+  const getSurveyLink = () => {
+    return `${window.location.origin}/answer/${room?.code}`;
+  };
+
+  const shareLink = async () => {
+    if (room && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${room.name} - 언박스 어스`,
+          text: '올해의 이야기를 함께 나눠요! 아래 링크에서 답변해주세요.',
+          url: getSurveyLink(),
+        });
+      } catch (err) {
+        navigator.clipboard.writeText(getSurveyLink());
+        toast.success('설문 링크가 복사되었어요!');
+      }
+    } else {
+      navigator.clipboard.writeText(getSurveyLink());
+      toast.success('설문 링크가 복사되었어요!');
     }
   };
 
-  const handleReveal = (answerId: string) => {
+  const startUnboxing = async () => {
     if (room) {
-      revealAnswer(room.id, answerId);
-      refreshRoom();
+      const success = await updateRoomStatus(room.id, 'unboxing');
+      if (success) {
+        setRoom({ ...room, status: 'unboxing' });
+        toast.success('언박싱을 시작해요!');
+      }
+    }
+  };
+
+  const handleReveal = async (answerId: string) => {
+    const success = await revealAnswer(answerId);
+    if (success) {
+      setRoom(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          answers: prev.answers.map(a => 
+            a.id === answerId ? { ...a, is_revealed: true } : a
+          ),
+        };
+      });
     }
   };
 
@@ -78,17 +120,25 @@ const HostView = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="font-pixel text-muted-foreground">로딩 중...</div>
+      </div>
+    );
+  }
+
   if (!room) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">Loading...</div>
+        <div className="font-pixel text-muted-foreground">방을 찾을 수 없어요</div>
       </div>
     );
   }
 
   const currentQuestion = room.questions[currentQuestionIndex];
-  const currentAnswers = room.answers.filter(a => a.questionId === currentQuestion?.id);
-  const uniqueParticipants = [...new Set(room.answers.map(a => a.authorNickname))].length;
+  const currentAnswers = room.answers.filter(a => a.question_id === currentQuestion?.id);
+  const uniqueParticipants = [...new Set(room.answers.map(a => a.author_nickname))].length;
 
   return (
     <div className={`min-h-screen ${room.theme === 'horse' ? 'theme-horse' : ''}`}>
@@ -108,7 +158,7 @@ const HostView = () => {
               {room.name}
             </h1>
             <div className="flex items-center gap-3 mt-2">
-              <span className="font-pixel text-[10px] text-muted-foreground">Code:</span>
+              <span className="font-pixel text-[10px] text-muted-foreground">코드:</span>
               <span className="font-pixel text-lg text-accent tracking-widest">{room.code}</span>
               <button
                 onClick={copyCode}
@@ -120,14 +170,28 @@ const HostView = () => {
                   <Copy className="w-4 h-4 text-muted-foreground" />
                 )}
               </button>
+              <button
+                onClick={shareLink}
+                className="p-1 bg-muted hover:bg-muted/80"
+              >
+                <Share2 className="w-4 h-4 text-muted-foreground" />
+              </button>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="pixel-card px-4 py-2">
-              <span className="font-pixel text-[10px] text-muted-foreground">Participants: </span>
+              <span className="font-pixel text-[10px] text-muted-foreground">참여자: </span>
               <span className="font-pixel text-lg text-accent">{uniqueParticipants}</span>
             </div>
+            
+            <button
+              onClick={() => navigate(`/results/${room.id}`)}
+              className="p-2 bg-muted hover:bg-muted/80"
+              title="결과 보기"
+            >
+              <BarChart3 className="w-4 h-4 text-muted-foreground" />
+            </button>
             
             <button
               onClick={refreshRoom}
@@ -146,20 +210,36 @@ const HostView = () => {
             className="flex flex-col items-center justify-center min-h-[60vh]"
           >
             <div className="pixel-card text-center max-w-lg">
-              <h2 className="font-pixel text-lg text-accent mb-4">Waiting for Answers</h2>
+              <h2 className="font-pixel text-lg text-accent mb-4">답변 수집 중</h2>
               <p className="font-pixel text-[10px] text-muted-foreground mb-6">
-                Share the room code with participants. Once everyone has submitted, start the unboxing!
+                참여자들에게 설문 링크를 공유하세요. 모두 제출하면 언박싱을 시작하세요!
               </p>
+              
+              <div className="mb-4 p-3 bg-muted">
+                <p className="font-pixel text-[8px] text-muted-foreground mb-2">설문 링크</p>
+                <p className="font-pixel text-[10px] text-accent break-all">{getSurveyLink()}</p>
+              </div>
+              
+              <PixelButton
+                variant="accent"
+                onClick={shareLink}
+                className="w-full mb-6"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <Share2 className="w-4 h-4" />
+                  설문 링크 공유하기
+                </span>
+              </PixelButton>
               
               <div className="mb-6">
                 <div className="font-pixel text-[10px] text-muted-foreground mb-2">
-                  Answers received:
+                  받은 답변:
                 </div>
                 <div className="font-pixel text-3xl text-secondary">
                   {room.answers.length}
                 </div>
                 <div className="font-pixel text-[8px] text-muted-foreground">
-                  ({room.questions.length} questions × {uniqueParticipants} participants)
+                  ({room.questions.length}개 질문 × {uniqueParticipants}명 참여)
                 </div>
               </div>
 
@@ -171,7 +251,7 @@ const HostView = () => {
               >
                 <span className="flex items-center gap-2">
                   <Play className="w-4 h-4" />
-                  Start Unboxing
+                  언박싱 시작하기
                 </span>
               </PixelButton>
             </div>
@@ -198,7 +278,7 @@ const HostView = () => {
                 className="pixel-card max-w-2xl flex-1 mx-4 text-center"
               >
                 <span className="font-pixel text-xs text-accent mb-2 block">
-                  Question {currentQuestionIndex + 1} / {room.questions.length}
+                  질문 {currentQuestionIndex + 1} / {room.questions.length}
                 </span>
                 <h2 className="font-pixel text-sm sm:text-lg text-foreground leading-relaxed">
                   {currentQuestion.text}
@@ -220,10 +300,10 @@ const HostView = () => {
                 {currentAnswers.map((answer, index) => (
                   <GiftBox
                     key={answer.id}
-                    theme={room.theme}
-                    isRevealed={answer.isRevealed}
+                    theme={room.theme as 'christmas' | 'horse'}
+                    isRevealed={answer.is_revealed}
                     answerText={answer.text}
-                    authorName={answer.authorNickname}
+                    authorName={answer.author_nickname}
                     onClick={() => handleReveal(answer.id)}
                     index={index}
                   />
@@ -232,7 +312,7 @@ const HostView = () => {
 
               {currentAnswers.length === 0 && (
                 <div className="font-pixel text-[10px] text-muted-foreground">
-                  No answers for this question yet
+                  이 질문에 대한 답변이 아직 없어요
                 </div>
               )}
             </div>

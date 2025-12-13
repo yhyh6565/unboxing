@@ -14,7 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      answers: {
+        Row: {
+          author_nickname: string
+          created_at: string
+          id: string
+          is_revealed: boolean
+          question_id: string
+          room_id: string
+          text: string
+        }
+        Insert: {
+          author_nickname: string
+          created_at?: string
+          id?: string
+          is_revealed?: boolean
+          question_id: string
+          room_id: string
+          text: string
+        }
+        Update: {
+          author_nickname?: string
+          created_at?: string
+          id?: string
+          is_revealed?: boolean
+          question_id?: string
+          room_id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answers_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          created_at: string
+          id: string
+          is_custom: boolean
+          order_index: number
+          room_id: string
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          order_index?: number
+          room_id: string
+          text: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_custom?: boolean
+          order_index?: number
+          room_id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          code: string
+          created_at: string
+          current_question_index: number
+          id: string
+          name: string
+          participant_count: number
+          status: string
+          theme: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          current_question_index?: number
+          id?: string
+          name: string
+          participant_count?: number
+          status?: string
+          theme?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          current_question_index?: number
+          id?: string
+          name?: string
+          participant_count?: number
+          status?: string
+          theme?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
