@@ -123,7 +123,7 @@ const HostView = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">로딩 중...</div>
+        <div className="text-muted-foreground">로딩 중...</div>
       </div>
     );
   }
@@ -131,7 +131,7 @@ const HostView = () => {
   if (!room) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">방을 찾을 수 없어요</div>
+        <div className="text-muted-foreground">방을 찾을 수 없어요</div>
       </div>
     );
   }
@@ -154,12 +154,12 @@ const HostView = () => {
           className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8"
         >
           <div>
-            <h1 className="font-pixel text-xl sm:text-2xl text-foreground pixel-text-shadow">
+            <h1 className="font-dnf text-2xl sm:text-3xl text-foreground pixel-text-shadow">
               {room.name}
             </h1>
             <div className="flex items-center gap-3 mt-2">
-              <span className="font-pixel text-[10px] text-muted-foreground">코드:</span>
-              <span className="font-pixel text-lg text-accent tracking-widest">{room.code}</span>
+              <span className="text-sm text-muted-foreground">코드:</span>
+              <span className="font-dnf text-xl text-accent tracking-widest">{room.code}</span>
               <button
                 onClick={copyCode}
                 className="p-1 bg-muted hover:bg-muted/80"
@@ -181,8 +181,8 @@ const HostView = () => {
 
           <div className="flex items-center gap-4">
             <div className="pixel-card px-4 py-2">
-              <span className="font-pixel text-[10px] text-muted-foreground">참여자: </span>
-              <span className="font-pixel text-lg text-accent">{uniqueParticipants}</span>
+              <span className="text-sm text-muted-foreground">참여자: </span>
+              <span className="font-dnf text-xl text-accent">{uniqueParticipants}</span>
             </div>
             
             <button
@@ -210,14 +210,14 @@ const HostView = () => {
             className="flex flex-col items-center justify-center min-h-[60vh]"
           >
             <div className="pixel-card text-center max-w-lg">
-              <h2 className="font-pixel text-lg text-accent mb-4">답변 수집 중</h2>
-              <p className="font-pixel text-[10px] text-muted-foreground mb-6">
+              <h2 className="font-dnf text-2xl text-accent mb-4">답변 수집 중</h2>
+              <p className="text-sm text-muted-foreground mb-6">
                 참여자들에게 설문 링크를 공유하세요. 모두 제출하면 언박싱을 시작하세요!
               </p>
               
               <div className="mb-4 p-3 bg-muted">
-                <p className="font-pixel text-[8px] text-muted-foreground mb-2">설문 링크</p>
-                <p className="font-pixel text-[10px] text-accent break-all">{getSurveyLink()}</p>
+                <p className="text-xs text-muted-foreground mb-2">설문 링크</p>
+                <p className="text-sm text-accent break-all">{getSurveyLink()}</p>
               </div>
               
               <PixelButton
@@ -232,13 +232,13 @@ const HostView = () => {
               </PixelButton>
               
               <div className="mb-6">
-                <div className="font-pixel text-[10px] text-muted-foreground mb-2">
+                <div className="text-sm text-muted-foreground mb-2">
                   받은 답변:
                 </div>
-                <div className="font-pixel text-3xl text-secondary">
+                <div className="font-dnf text-4xl text-secondary">
                   {room.answers.length}
                 </div>
-                <div className="font-pixel text-[8px] text-muted-foreground">
+                <div className="text-xs text-muted-foreground">
                   ({room.questions.length}개 질문 × {uniqueParticipants}명 참여)
                 </div>
               </div>
@@ -277,10 +277,10 @@ const HostView = () => {
                 animate={{ y: 0, opacity: 1 }}
                 className="pixel-card max-w-2xl flex-1 mx-4 text-center"
               >
-                <span className="font-pixel text-xs text-accent mb-2 block">
+                <span className="text-sm text-accent mb-2 block">
                   질문 {currentQuestionIndex + 1} / {room.questions.length}
                 </span>
-                <h2 className="font-pixel text-sm sm:text-lg text-foreground leading-relaxed">
+                <h2 className="text-base sm:text-lg text-foreground leading-relaxed">
                   {currentQuestion.text}
                 </h2>
               </motion.div>
@@ -311,7 +311,7 @@ const HostView = () => {
               </AnimatePresence>
 
               {currentAnswers.length === 0 && (
-                <div className="font-pixel text-[10px] text-muted-foreground">
+                <div className="text-sm text-muted-foreground">
                   이 질문에 대한 답변이 아직 없어요
                 </div>
               )}

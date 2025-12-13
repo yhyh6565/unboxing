@@ -56,7 +56,7 @@ const JoinRoom = () => {
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 font-pixel text-[10px] text-muted-foreground hover:text-foreground mb-8"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           뒤로
@@ -66,7 +66,7 @@ const JoinRoom = () => {
           <motion.h1
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="font-pixel text-2xl text-foreground pixel-text-shadow mb-8 text-center"
+            className="font-dnf text-3xl text-foreground pixel-text-shadow mb-8 text-center"
           >
             방 참여하기
           </motion.h1>
@@ -95,7 +95,7 @@ const JoinRoom = () => {
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
               />
-              <p className="font-pixel text-[8px] text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 이 이름은 답변 공개 시 함께 보여져요!
               </p>
             </div>
@@ -121,7 +121,7 @@ const JoinRoom = () => {
             transition={{ delay: 0.5 }}
             className="mt-8 text-center"
           >
-            <p className="font-pixel text-[8px] text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               방 코드는 주최자에게 물어보세요 🎁
             </p>
           </motion.div>
