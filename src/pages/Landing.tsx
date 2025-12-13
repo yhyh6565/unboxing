@@ -1,12 +1,73 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Gift, Users, Sparkles, HelpCircle } from 'lucide-react';
+import { Gift, Users, Sparkles, HelpCircle, FileText } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import SnowEffect from '@/components/SnowEffect';
+import { generateResultsPDF } from '@/lib/pdf-generator';
+import { FullRoom, AnswerData } from '@/lib/supabase-storage';
+import { toast } from 'sonner';
+
+// Demo data for PDF preview
+const createDemoData = (): { room: FullRoom; answersByParticipant: Record<string, AnswerData[]> } => {
+  const roomId = 'demo-room-id';
+  const questions = [
+    { id: 'q1', room_id: roomId, text: '올해 가장 기억에 남는 순간은?', order_index: 0, is_custom: false },
+    { id: 'q2', room_id: roomId, text: '2024년 나에게 주고 싶은 칭찬 한마디?', order_index: 1, is_custom: false },
+    { id: 'q3', room_id: roomId, text: '내년에 꼭 이루고 싶은 목표는?', order_index: 2, is_custom: false },
+  ];
+
+  const answers: AnswerData[] = [
+    { id: 'a1', room_id: roomId, question_id: 'q1', author_nickname: '민수', text: '친구들과 함께한 제주도 여행! 바다에서 수영하고 맛있는 흑돼지도 먹고 정말 행복했어요 🌊', is_revealed: true },
+    { id: 'a2', room_id: roomId, question_id: 'q1', author_nickname: '지영', text: '첫 해외여행으로 일본 오사카에 다녀왔어요. 도톤보리에서 먹은 타코야키 맛을 잊을 수가 없네요!', is_revealed: true },
+    { id: 'a3', room_id: roomId, question_id: 'q1', author_nickname: '현우', text: '드디어 운전면허 땄다!! 6번만에 성공 ㅋㅋㅋ 포기하지 않길 잘했어', is_revealed: true },
+    { id: 'a4', room_id: roomId, question_id: 'q2', author_nickname: '민수', text: '힘든 일도 많았지만 끝까지 버텨낸 나 자신이 대견해! 내년에도 화이팅!', is_revealed: true },
+    { id: 'a5', room_id: roomId, question_id: 'q2', author_nickname: '지영', text: '새로운 도전을 두려워하지 않은 용감한 나에게 박수! 👏', is_revealed: true },
+    { id: 'a6', room_id: roomId, question_id: 'q2', author_nickname: '현우', text: '매일 아침 운동하느라 고생했어. 덕분에 5kg 감량 성공!', is_revealed: true },
+    { id: 'a7', room_id: roomId, question_id: 'q3', author_nickname: '민수', text: '영어 공부해서 해외여행 갈 때 불편함 없이 대화하고 싶어요!', is_revealed: true },
+    { id: 'a8', room_id: roomId, question_id: 'q3', author_nickname: '지영', text: '저축해서 내 집 마련 첫 단추 끼우기! 🏠', is_revealed: true },
+    { id: 'a9', room_id: roomId, question_id: 'q3', author_nickname: '현우', text: '마라톤 완주! 이번엔 진짜 해낼거야', is_revealed: true },
+  ];
+
+  const room: FullRoom = {
+    id: roomId,
+    name: '2024 송년회 추억상자',
+    code: 'DEMO24',
+    theme: 'christmas',
+    status: 'completed',
+    participant_count: 3,
+    current_question_index: 0,
+    created_at: new Date().toISOString(),
+    questions,
+    answers,
+  };
+
+  const answersByParticipant: Record<string, AnswerData[]> = {
+    '민수': answers.filter(a => a.author_nickname === '민수'),
+    '지영': answers.filter(a => a.author_nickname === '지영'),
+    '현우': answers.filter(a => a.author_nickname === '현우'),
+  };
+
+  return { room, answersByParticipant };
+};
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [isGeneratingDemo, setIsGeneratingDemo] = useState(false);
 
+  const handleDemoPDF = async () => {
+    setIsGeneratingDemo(true);
+    try {
+      const { room, answersByParticipant } = createDemoData();
+      await generateResultsPDF(room, answersByParticipant);
+      toast.success('데모 PDF가 다운로드되었어요!');
+    } catch (error) {
+      console.error('Demo PDF error:', error);
+      toast.error('PDF 생성에 실패했어요');
+    } finally {
+      setIsGeneratingDemo(false);
+    }
+  };
   return (
     <div className="min-h-screen relative overflow-hidden">
       <SnowEffect />
@@ -87,17 +148,32 @@ const Landing = () => {
           </div>
         </motion.div>
 
-        {/* How to Play Link */}
-        <motion.button
+        {/* How to Play & Demo Links */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.45 }}
-          onClick={() => navigate('/how-to-play')}
-          className="flex items-center gap-2 text-sm text-accent hover:text-accent/80 mb-8 transition-colors"
+          className="flex flex-wrap items-center justify-center gap-4 mb-8"
         >
-          <HelpCircle className="w-4 h-4" />
-          게임 플레이북 보기
-        </motion.button>
+          <button
+            onClick={() => navigate('/how-to-play')}
+            className="flex items-center gap-2 text-sm text-accent hover:text-accent/80 transition-colors"
+          >
+            <HelpCircle className="w-4 h-4" />
+            게임 플레이북 보기
+          </button>
+          
+          <span className="text-muted-foreground">•</span>
+          
+          <button
+            onClick={handleDemoPDF}
+            disabled={isGeneratingDemo}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          >
+            <FileText className="w-4 h-4" />
+            {isGeneratingDemo ? 'PDF 생성 중...' : 'PDF 결과물 미리보기'}
+          </button>
+        </motion.div>
 
         {/* Action Buttons */}
         <motion.div
