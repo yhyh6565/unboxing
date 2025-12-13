@@ -59,19 +59,19 @@ const Landing = () => {
         >
           <div className="flex items-start gap-3 mb-4">
             <div className="w-4 h-4 bg-accent flex-shrink-0 mt-1" />
-            <p className="font-pixel text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
+            <p className="text-sm leading-relaxed text-muted-foreground">
               지금 익명으로 답변하세요.
             </p>
           </div>
           <div className="flex items-start gap-3 mb-4">
             <div className="w-4 h-4 bg-secondary flex-shrink-0 mt-1" />
-            <p className="font-pixel text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
+            <p className="text-sm leading-relaxed text-muted-foreground">
               파티에서 다 같이 작성자를 공개해요!
             </p>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-4 h-4 bg-primary flex-shrink-0 mt-1" />
-            <p className="font-pixel text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
+            <p className="text-sm leading-relaxed text-muted-foreground">
               솔직하고 재미있게! 🎁
             </p>
           </div>

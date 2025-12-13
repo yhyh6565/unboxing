@@ -113,12 +113,18 @@ const CreateRoom = () => {
             animate={{ scale: 1 }}
             className="pixel-card max-w-md w-full text-center"
           >
-            <h2 className="font-pixel text-xl text-accent mb-6">방이 생성되었어요!</h2>
+            <h2 className="font-dnf text-2xl text-accent mb-6">방이 생성되었어요!</h2>
             
+            <div className="mb-4 p-3 bg-destructive/20 border-2 border-destructive">
+              <p className="text-sm text-destructive font-bold">
+                ⚠️ 방 코드를 꼭 복사해두세요! 나중에 확인할 수 없어요.
+              </p>
+            </div>
+
             <div className="mb-6">
-              <p className="font-pixel text-[10px] text-muted-foreground mb-2">방 코드</p>
+              <p className="text-sm text-muted-foreground mb-2">방 코드</p>
               <div className="flex items-center justify-center gap-3">
-                <span className="font-pixel text-3xl text-foreground tracking-widest">
+                <span className="font-dnf text-4xl text-foreground tracking-widest">
                   {createdRoom.code}
                 </span>
                 <button
@@ -136,10 +142,10 @@ const CreateRoom = () => {
 
             {/* 설문 링크 공유 */}
             <div className="mb-6 p-4 bg-muted">
-              <p className="font-pixel text-[10px] text-muted-foreground mb-3">
+              <p className="text-sm text-muted-foreground mb-3">
                 아래 링크를 모임원들에게 공유하세요!
               </p>
-              <div className="font-pixel text-[8px] text-accent break-all mb-3 p-2 bg-background">
+              <div className="text-xs text-accent break-all mb-3 p-2 bg-background">
                 {getSurveyLink()}
               </div>
               <PixelButton
@@ -154,7 +160,7 @@ const CreateRoom = () => {
               </PixelButton>
             </div>
 
-            <p className="font-pixel text-[10px] text-muted-foreground mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               모임원들이 링크를 통해 바로 답변할 수 있어요!
             </p>
 
@@ -186,7 +192,7 @@ const CreateRoom = () => {
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 font-pixel text-[10px] text-muted-foreground hover:text-foreground mb-8"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           뒤로
@@ -196,7 +202,7 @@ const CreateRoom = () => {
           <motion.h1
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="font-pixel text-2xl text-foreground pixel-text-shadow mb-8 text-center"
+            className="font-dnf text-3xl text-foreground pixel-text-shadow mb-8 text-center"
           >
             방 만들기
           </motion.h1>
@@ -219,22 +225,22 @@ const CreateRoom = () => {
 
             {/* Participant Count */}
             <div className="pixel-card">
-              <label className="block text-[10px] font-pixel text-muted-foreground mb-2 uppercase">
+              <label className="block text-sm text-muted-foreground mb-2">
                 예상 참여자 수
               </label>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setParticipantCount(Math.max(2, participantCount - 1))}
-                  className="w-10 h-10 bg-muted hover:bg-muted/80 font-pixel text-xl"
+                  className="w-10 h-10 bg-muted hover:bg-muted/80 text-xl"
                 >
                   -
                 </button>
-                <span className="font-pixel text-2xl text-foreground w-16 text-center">
+                <span className="font-dnf text-3xl text-foreground w-16 text-center">
                   {participantCount}
                 </span>
                 <button
                   onClick={() => setParticipantCount(Math.min(20, participantCount + 1))}
-                  className="w-10 h-10 bg-muted hover:bg-muted/80 font-pixel text-xl"
+                  className="w-10 h-10 bg-muted hover:bg-muted/80 text-xl"
                 >
                   +
                 </button>
@@ -251,7 +257,7 @@ const CreateRoom = () => {
 
             {/* Questions */}
             <div className="pixel-card">
-              <label className="block text-[10px] font-pixel text-muted-foreground mb-4 uppercase">
+              <label className="block text-sm text-muted-foreground mb-4">
                 질문 목록 ({questions.length}개)
               </label>
               
@@ -263,10 +269,10 @@ const CreateRoom = () => {
                     animate={{ x: 0, opacity: 1 }}
                     className="flex items-start gap-3 bg-muted p-3"
                   >
-                    <span className="font-pixel text-[10px] text-accent flex-shrink-0">
+                    <span className="text-sm text-accent flex-shrink-0">
                       {String(index + 1).padStart(2, '0')}
                     </span>
-                    <span className="font-pixel text-[10px] text-foreground flex-1">
+                    <span className="text-sm text-foreground flex-1">
                       {q.text}
                     </span>
                     <button

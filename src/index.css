@@ -101,9 +101,10 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-base;
     font-family: 'Galmuri9', 'Press Start 2P', sans-serif;
     image-rendering: pixelated;
+    font-size: 16px;
   }
 }
 

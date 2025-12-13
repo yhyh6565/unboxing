@@ -97,7 +97,7 @@ const AnswerSubmission = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">로딩 중...</div>
+        <div className="text-muted-foreground">로딩 중...</div>
       </div>
     );
   }
@@ -105,7 +105,7 @@ const AnswerSubmission = () => {
   if (!room) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">방을 찾을 수 없어요</div>
+        <div className="text-muted-foreground">방을 찾을 수 없어요</div>
       </div>
     );
   }
@@ -126,13 +126,13 @@ const AnswerSubmission = () => {
             >
               <CheckCircle className="w-16 h-16 text-secondary mx-auto mb-4" />
             </motion.div>
-            <h2 className="font-pixel text-xl text-accent mb-4">제출 완료!</h2>
-            <p className="font-pixel text-[10px] text-muted-foreground mb-2">
+            <h2 className="font-dnf text-2xl text-accent mb-4">제출 완료!</h2>
+            <p className="text-sm text-muted-foreground mb-2">
               답변이 잠금 처리되었어요. 파티에서 함께 공개해요!
             </p>
             <div className="flex items-center justify-center gap-2 mt-4">
               <Lock className="w-4 h-4 text-muted-foreground" />
-              <span className="font-pixel text-[8px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 공개될 때까지 비밀이에요!
               </span>
             </div>
@@ -155,8 +155,8 @@ const AnswerSubmission = () => {
             animate={{ y: 0, opacity: 1 }}
             className="text-center mb-6"
           >
-            <h1 className="font-pixel text-lg text-foreground mb-2">{room.name}</h1>
-            <p className="font-pixel text-[8px] text-muted-foreground">
+            <h1 className="font-dnf text-2xl text-foreground mb-2">{room.name}</h1>
+            <p className="text-xs text-muted-foreground">
               닉네임은 공개 시 함께 보여져요
             </p>
           </motion.div>
@@ -170,9 +170,9 @@ const AnswerSubmission = () => {
             <div className="pixel-card">
               <div className="flex items-center gap-2 mb-2">
                 <Edit3 className="w-4 h-4 text-accent" />
-                <label className="font-pixel text-[10px] text-muted-foreground uppercase">
-                  닉네임
-                </label>
+              <label className="text-sm text-muted-foreground">
+                닉네임
+              </label>
               </div>
               <PixelInput
                 placeholder="나의 닉네임"
@@ -192,10 +192,10 @@ const AnswerSubmission = () => {
               />
             </div>
             <div className="flex justify-between mt-2">
-              <span className="font-pixel text-[8px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {currentQuestion + 1} / {room.questions.length}
               </span>
-              <span className="font-pixel text-[8px] text-accent">
+              <span className="text-xs text-accent">
                 {Math.round(progress)}% 완료
               </span>
             </div>
@@ -210,10 +210,10 @@ const AnswerSubmission = () => {
             className="pixel-card mb-6"
           >
             <div className="flex items-start gap-3 mb-4">
-              <span className="font-pixel text-lg text-accent flex-shrink-0">
+              <span className="font-dnf text-xl text-accent flex-shrink-0">
                 Q{currentQuestion + 1}
               </span>
-              <p className="font-pixel text-[10px] text-foreground leading-relaxed">
+              <p className="text-sm text-foreground leading-relaxed">
                 {question.text}
               </p>
             </div>
