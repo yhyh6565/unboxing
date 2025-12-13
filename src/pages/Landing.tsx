@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Gift, Users, Sparkles } from 'lucide-react';
+import { Gift, Users, Sparkles, HelpCircle } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import SnowEffect from '@/components/SnowEffect';
 
@@ -50,12 +50,22 @@ const Landing = () => {
           />
         </motion.div>
 
+        {/* Service Description */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-center text-muted-foreground mb-6 max-w-md"
+        >
+          🎁 익명의 답변 속에서 친구를 찾아라! 연말 모임을 특별하게 만들어 줄 추억 제조기
+        </motion.p>
+
         {/* Subtitle / Rules */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="max-w-lg mx-auto mb-12 pixel-card"
+          transition={{ delay: 0.4 }}
+          className="max-w-lg mx-auto mb-8 pixel-card"
         >
           <div className="flex items-start gap-3 mb-4">
             <div className="w-4 h-4 bg-accent flex-shrink-0 mt-1" />
@@ -76,6 +86,18 @@ const Landing = () => {
             </p>
           </div>
         </motion.div>
+
+        {/* How to Play Link */}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.45 }}
+          onClick={() => navigate('/how-to-play')}
+          className="flex items-center gap-2 text-sm text-accent hover:text-accent/80 mb-8 transition-colors"
+        >
+          <HelpCircle className="w-4 h-4" />
+          게임 플레이북 보기
+        </motion.button>
 
         {/* Action Buttons */}
         <motion.div

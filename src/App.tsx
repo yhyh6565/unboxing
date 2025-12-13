@@ -9,6 +9,7 @@ import JoinRoom from "./pages/JoinRoom";
 import AnswerSubmission from "./pages/AnswerSubmission";
 import HostView from "./pages/HostView";
 import Results from "./pages/Results";
+import HowToPlay from "./pages/HowToPlay";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/answer/:code" element={<AnswerSubmission />} />
           <Route path="/host/:id" element={<HostView />} />
           <Route path="/results/:id" element={<Results />} />
+          <Route path="/how-to-play" element={<HowToPlay />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

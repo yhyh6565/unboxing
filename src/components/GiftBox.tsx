@@ -114,11 +114,11 @@ const GiftBox = ({
             transition={{ type: 'spring', stiffness: 200 }}
           >
             <div className="text-center">
-              <div className="text-[10px] sm:text-xs font-pixel text-foreground mb-4 leading-relaxed">
+              <div className="text-sm text-foreground mb-4 leading-relaxed">
                 "{answerText}"
               </div>
               <div className="border-t border-border pt-3 mt-3">
-                <span className="text-[8px] font-pixel text-accent">— {authorName}</span>
+                <span className="text-xs text-accent">— {authorName}</span>
               </div>
             </div>
           </motion.div>

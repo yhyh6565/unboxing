@@ -9,14 +9,14 @@ const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-[10px] font-pixel text-muted-foreground mb-2 uppercase">
+          <label className="block text-sm text-muted-foreground mb-2">
             {label}
           </label>
         )}
         <input
           ref={ref}
           className={`
-            w-full bg-input text-foreground font-pixel text-[10px]
+            w-full bg-input text-foreground text-base
             px-4 py-3 outline-none
             placeholder:text-muted-foreground
             focus:ring-2 focus:ring-accent
