@@ -5,7 +5,9 @@ import { ChevronLeft, ChevronRight, Copy, Check, Play, RotateCcw, Share2, BarCha
 import PixelButton from '@/components/PixelButton';
 import GiftBox from '@/components/GiftBox';
 import SnowEffect from '@/components/SnowEffect';
+import VictoryScreen from '@/components/VictoryScreen';
 import { getRoomById, updateRoomStatus, revealAnswer, subscribeToAnswers, FullRoom, AnswerData } from '@/lib/supabase-storage';
+import { generateResultsPDF } from '@/lib/pdf-generator';
 import { toast } from 'sonner';
 
 const HostView = () => {
@@ -16,6 +18,7 @@ const HostView = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showAuthors, setShowAuthors] = useState(false);
+  const [showVictory, setShowVictory] = useState(false);
 
   useEffect(() => {
     const loadRoom = async () => {
@@ -138,6 +141,36 @@ const HostView = () => {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
+
+  const completeUnboxing = () => {
+    setShowVictory(true);
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!room) return;
+    
+    const answersByParticipant: Record<string, Array<{ question_id: string; text: string; author_nickname: string }>> = {};
+    room.answers.forEach(answer => {
+      if (!answersByParticipant[answer.author_nickname]) {
+        answersByParticipant[answer.author_nickname] = [];
+      }
+      answersByParticipant[answer.author_nickname].push({
+        question_id: answer.question_id,
+        text: answer.text,
+        author_nickname: answer.author_nickname,
+      });
+    });
+
+    try {
+      await generateResultsPDF(room, answersByParticipant);
+      toast.success('PDF가 다운로드되었어요!');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('PDF 생성에 실패했어요');
+    }
+  };
+
+  const isLastQuestion = room ? currentQuestionIndex === room.questions.length - 1 : false;
 
   if (isLoading) {
     return (
@@ -317,13 +350,25 @@ const HostView = () => {
                 </button>
               </motion.div>
 
-              <button
-                onClick={nextQuestion}
-                disabled={currentQuestionIndex === room.questions.length - 1}
-                className="p-3 bg-muted hover:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
+              {isLastQuestion ? (
+                <PixelButton
+                  variant="accent"
+                  onClick={completeUnboxing}
+                  className="p-3"
+                >
+                  <span className="flex items-center gap-1">
+                    완료
+                    <ChevronRight className="w-5 h-5" />
+                  </span>
+                </PixelButton>
+              ) : (
+                <button
+                  onClick={nextQuestion}
+                  className="p-3 bg-muted hover:bg-muted/80"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              )}
             </div>
 
             {/* Gift Boxes / Answers */}
@@ -365,6 +410,19 @@ const HostView = () => {
               ))}
             </div>
           </div>
+        )}
+
+        {/* Victory Screen */}
+        {showVictory && room && (
+          <VictoryScreen
+            roomName={room.name}
+            participantCount={uniqueParticipants}
+            questionCount={room.questions.length}
+            answerCount={room.answers.length}
+            theme={room.theme as 'christmas' | 'horse'}
+            onDownloadPDF={handleDownloadPDF}
+            onBackToQuestions={() => setShowVictory(false)}
+          />
         )}
       </div>
     </div>
