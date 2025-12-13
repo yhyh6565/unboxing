@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Copy, Check, Play, RotateCcw, Share2, BarChart3 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, Check, Play, RotateCcw, Share2, BarChart3, Eye, EyeOff } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import GiftBox from '@/components/GiftBox';
 import SnowEffect from '@/components/SnowEffect';
@@ -15,6 +15,7 @@ const HostView = () => {
   const [copied, setCopied] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAuthors, setShowAuthors] = useState(false);
 
   useEffect(() => {
     const loadRoom = async () => {
@@ -233,13 +234,13 @@ const HostView = () => {
               
               <div className="mb-6">
                 <div className="text-sm text-muted-foreground mb-2">
-                  받은 답변:
+                  참여자:
                 </div>
                 <div className="font-dnf text-4xl text-secondary">
-                  {room.answers.length}
+                  {uniqueParticipants}명
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  ({room.questions.length}개 질문 × {uniqueParticipants}명 참여)
+                  ({room.questions.length}개 질문 × 총 {room.answers.length}개 답변)
                 </div>
               </div>
 
@@ -275,7 +276,7 @@ const HostView = () => {
                 key={currentQuestion.id}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="pixel-card max-w-2xl flex-1 mx-4 text-center"
+                className="pixel-card max-w-2xl flex-1 mx-4 text-center relative"
               >
                 <span className="text-sm text-accent mb-2 block">
                   질문 {currentQuestionIndex + 1} / {room.questions.length}
@@ -283,6 +284,19 @@ const HostView = () => {
                 <h2 className="text-base sm:text-lg text-foreground leading-relaxed">
                   {currentQuestion.text}
                 </h2>
+                
+                {/* Author visibility toggle */}
+                <button
+                  onClick={() => setShowAuthors(!showAuthors)}
+                  className="absolute top-2 right-2 p-2 bg-muted hover:bg-muted/80 transition-colors"
+                  title={showAuthors ? '작성자 숨기기' : '작성자 보기'}
+                >
+                  {showAuthors ? (
+                    <Eye className="w-4 h-4 text-accent" />
+                  ) : (
+                    <EyeOff className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </button>
               </motion.div>
 
               <button
@@ -304,6 +318,7 @@ const HostView = () => {
                     isRevealed={answer.is_revealed}
                     answerText={answer.text}
                     authorName={answer.author_nickname}
+                    showAuthor={showAuthors}
                     onClick={() => handleReveal(answer.id)}
                     index={index}
                   />
