@@ -36,7 +36,7 @@ const Results = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">로딩 중...</div>
+        <div className="text-muted-foreground">로딩 중...</div>
       </div>
     );
   }
@@ -44,7 +44,7 @@ const Results = () => {
   if (!room) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">방을 찾을 수 없어요</div>
+        <div className="text-muted-foreground">방을 찾을 수 없어요</div>
       </div>
     );
   }
@@ -69,16 +69,16 @@ const Results = () => {
         >
           <button
             onClick={() => navigate(`/host/${room.id}`)}
-            className="flex items-center gap-2 font-pixel text-[10px] text-muted-foreground hover:text-foreground mb-4"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             호스트 화면으로 돌아가기
           </button>
           
-          <h1 className="font-pixel text-xl sm:text-2xl text-foreground pixel-text-shadow">
+          <h1 className="font-dnf text-2xl sm:text-3xl text-foreground pixel-text-shadow">
             {room.name} - 최종 결과
           </h1>
-          <p className="font-pixel text-[10px] text-muted-foreground mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             참여자별 답변 모아보기
           </p>
         </motion.div>
@@ -87,7 +87,7 @@ const Results = () => {
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="pixel-card text-center">
               <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="font-pixel text-[10px] text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 아직 제출된 답변이 없어요
               </p>
             </div>
@@ -97,7 +97,7 @@ const Results = () => {
             {/* Participant List */}
             <div className="lg:col-span-1">
               <div className="pixel-card">
-                <h2 className="font-pixel text-sm text-accent mb-4">
+                <h2 className="text-lg text-accent mb-4 font-bold">
                   참여자 목록 ({participants.length}명)
                 </h2>
                 <div className="space-y-2">
@@ -115,8 +115,8 @@ const Results = () => {
                       }`}
                     >
                       <User className="w-4 h-4" />
-                      <span className="font-pixel text-[10px]">{name}</span>
-                      <span className="font-pixel text-[8px] ml-auto">
+                      <span className="text-sm">{name}</span>
+                      <span className="text-xs ml-auto">
                         {answersByParticipant[name].length}개 답변
                       </span>
                     </motion.button>
@@ -136,7 +136,7 @@ const Results = () => {
                 >
                   <div className="flex items-center gap-3 mb-6">
                     <User className="w-6 h-6 text-accent" />
-                    <h2 className="font-pixel text-lg text-foreground">
+                    <h2 className="font-dnf text-xl text-foreground">
                       {selectedParticipant}의 답변
                     </h2>
                   </div>
@@ -150,10 +150,10 @@ const Results = () => {
                         transition={{ delay: index * 0.1 }}
                         className="bg-muted p-4"
                       >
-                        <p className="font-pixel text-[10px] text-accent mb-2">
+                        <p className="text-sm text-accent mb-2">
                           Q{index + 1}. {getQuestionText(answer.question_id)}
                         </p>
-                        <p className="font-pixel text-[10px] text-foreground leading-relaxed">
+                        <p className="text-base text-foreground leading-relaxed">
                           {answer.text}
                         </p>
                       </motion.div>
@@ -162,7 +162,7 @@ const Results = () => {
                 </motion.div>
               ) : (
                 <div className="pixel-card flex items-center justify-center min-h-[300px]">
-                  <p className="font-pixel text-[10px] text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     왼쪽에서 참여자를 선택하세요
                   </p>
                 </div>
@@ -179,7 +179,7 @@ const Results = () => {
             transition={{ delay: 0.5 }}
             className="mt-12"
           >
-            <h2 className="font-pixel text-lg text-accent mb-6">질문별 전체 답변</h2>
+            <h2 className="font-dnf text-xl text-accent mb-6">질문별 전체 답변</h2>
             
             <div className="space-y-8">
               {room.questions.map((question, qIndex) => {
@@ -187,12 +187,12 @@ const Results = () => {
                 
                 return (
                   <div key={question.id} className="pixel-card">
-                    <h3 className="font-pixel text-sm text-foreground mb-4">
+                    <h3 className="text-base text-foreground mb-4 font-bold">
                       Q{qIndex + 1}. {question.text}
                     </h3>
                     
                     {questionAnswers.length === 0 ? (
-                      <p className="font-pixel text-[10px] text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         답변이 없어요
                       </p>
                     ) : (
@@ -205,10 +205,10 @@ const Results = () => {
                             transition={{ delay: aIndex * 0.05 }}
                             className="bg-muted p-3"
                           >
-                            <p className="font-pixel text-[10px] text-foreground mb-2">
+                            <p className="text-sm text-foreground mb-2">
                               {answer.text}
                             </p>
-                            <p className="font-pixel text-[8px] text-accent">
+                            <p className="text-xs text-accent">
                               - {answer.author_nickname}
                             </p>
                           </motion.div>

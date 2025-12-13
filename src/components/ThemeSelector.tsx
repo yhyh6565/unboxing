@@ -9,8 +9,8 @@ interface ThemeSelectorProps {
 
 const ThemeSelector = ({ value, onChange }: ThemeSelectorProps) => {
   const themes: { id: Theme; label: string; icon: typeof TreePine; description: string }[] = [
-    { id: 'christmas', label: 'Christmas', icon: TreePine, description: 'Gifts under the tree' },
-    { id: 'horse', label: '2026 Horse', icon: Sun, description: 'Lucky bags & sunrise' },
+    { id: 'christmas', label: '크리스마스', icon: TreePine, description: '트리 아래 선물 열기' },
+    { id: 'horse', label: '2026 붉은 말', icon: Sun, description: '복주머니와 새해 일출' },
   ];
 
   return (
@@ -39,8 +39,8 @@ const ThemeSelector = ({ value, onChange }: ThemeSelectorProps) => {
             whileTap={{ scale: 0.98 }}
           >
             <Icon className="w-8 h-8 mb-2" />
-            <div className="font-pixel text-[10px] uppercase">{theme.label}</div>
-            <div className="font-pixel text-[8px] mt-1 opacity-70">{theme.description}</div>
+            <div className="text-sm font-bold">{theme.label}</div>
+            <div className="text-xs mt-1 opacity-70">{theme.description}</div>
             
             {isSelected && (
               <motion.div
