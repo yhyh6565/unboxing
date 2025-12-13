@@ -1,65 +1,85 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Send, CheckCircle, Lock } from 'lucide-react';
+import { Send, CheckCircle, Lock, Edit3 } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import PixelTextarea from '@/components/PixelTextarea';
-import { getRoomByCode, getParticipant, addAnswerToRoom, saveParticipant, generateId } from '@/lib/storage';
-import { Room, Answer } from '@/types/game';
+import PixelInput from '@/components/PixelInput';
+import { getRoomByCode, submitAnswers, FullRoom } from '@/lib/supabase-storage';
+import { getParticipant, saveParticipant } from '@/lib/storage';
 import { toast } from 'sonner';
 
 const AnswerSubmission = () => {
   const navigate = useNavigate();
   const { code } = useParams<{ code: string }>();
-  const [room, setRoom] = useState<Room | null>(null);
+  const [room, setRoom] = useState<FullRoom | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [nickname, setNickname] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (code) {
-      const foundRoom = getRoomByCode(code);
-      if (foundRoom) {
-        setRoom(foundRoom);
-        const participant = getParticipant();
-        if (participant?.hasSubmitted && participant.roomCode === code) {
-          setSubmitted(true);
+    const loadRoom = async () => {
+      if (code) {
+        const foundRoom = await getRoomByCode(code);
+        if (foundRoom) {
+          setRoom(foundRoom);
+          const participant = getParticipant();
+          if (participant?.hasSubmitted && participant.roomCode === code) {
+            setSubmitted(true);
+          }
+          if (participant?.nickname && participant.roomCode === code) {
+            setNickname(participant.nickname);
+          }
+        } else {
+          toast.error('방을 찾을 수 없어요');
+          navigate('/join');
         }
-      } else {
-        toast.error('Room not found');
-        navigate('/join');
       }
-    }
+      setIsLoading(false);
+    };
+
+    loadRoom();
   }, [code, navigate]);
 
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const handleSubmit = () => {
-    const participant = getParticipant();
-    if (!participant || !room) return;
-
-    const unanswered = room.questions.filter(q => !answers[q.id]?.trim());
-    if (unanswered.length > 0) {
-      toast.error('Please answer all questions');
+  const handleSubmit = async () => {
+    if (!nickname.trim()) {
+      toast.error('닉네임을 입력해주세요');
       return;
     }
 
-    room.questions.forEach(question => {
-      const answer: Answer = {
-        id: generateId(),
-        questionId: question.id,
-        text: answers[question.id].trim(),
-        authorNickname: participant.nickname,
-        isRevealed: false,
-      };
-      addAnswerToRoom(room.code, answer);
-    });
+    if (!room) return;
 
-    saveParticipant({ ...participant, hasSubmitted: true });
-    setSubmitted(true);
-    toast.success('Answers submitted successfully!');
+    const unanswered = room.questions.filter(q => !answers[q.id]?.trim());
+    if (unanswered.length > 0) {
+      toast.error('모든 질문에 답변해주세요');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const answersArray = room.questions.map(question => ({
+      questionId: question.id,
+      text: answers[question.id].trim(),
+    }));
+
+    const success = await submitAnswers(room.id, nickname.trim(), answersArray);
+
+    setIsSubmitting(false);
+
+    if (success) {
+      saveParticipant({ nickname: nickname.trim(), roomCode: room.code, hasSubmitted: true });
+      setSubmitted(true);
+      toast.success('답변이 제출되었어요!');
+    } else {
+      toast.error('제출에 실패했어요. 다시 시도해주세요.');
+    }
   };
 
   const nextQuestion = () => {
@@ -74,10 +94,18 @@ const AnswerSubmission = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="font-pixel text-muted-foreground">로딩 중...</div>
+      </div>
+    );
+  }
+
   if (!room) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="font-pixel text-muted-foreground">Loading...</div>
+        <div className="font-pixel text-muted-foreground">방을 찾을 수 없어요</div>
       </div>
     );
   }
@@ -98,14 +126,14 @@ const AnswerSubmission = () => {
             >
               <CheckCircle className="w-16 h-16 text-secondary mx-auto mb-4" />
             </motion.div>
-            <h2 className="font-pixel text-xl text-accent mb-4">All Done!</h2>
+            <h2 className="font-pixel text-xl text-accent mb-4">제출 완료!</h2>
             <p className="font-pixel text-[10px] text-muted-foreground mb-2">
-              Your answers are locked and ready to be unboxed.
+              답변이 잠금 처리되었어요. 파티에서 함께 공개해요!
             </p>
             <div className="flex items-center justify-center gap-2 mt-4">
               <Lock className="w-4 h-4 text-muted-foreground" />
               <span className="font-pixel text-[8px] text-muted-foreground">
-                Identity hidden until the big reveal!
+                공개될 때까지 비밀이에요!
               </span>
             </div>
           </motion.div>
@@ -129,8 +157,29 @@ const AnswerSubmission = () => {
           >
             <h1 className="font-pixel text-lg text-foreground mb-2">{room.name}</h1>
             <p className="font-pixel text-[8px] text-muted-foreground">
-              Your name is hidden until we unbox it together
+              닉네임은 공개 시 함께 보여져요
             </p>
+          </motion.div>
+
+          {/* Nickname input */}
+          <motion.div
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="mb-6"
+          >
+            <div className="pixel-card">
+              <div className="flex items-center gap-2 mb-2">
+                <Edit3 className="w-4 h-4 text-accent" />
+                <label className="font-pixel text-[10px] text-muted-foreground uppercase">
+                  닉네임
+                </label>
+              </div>
+              <PixelInput
+                placeholder="나의 닉네임"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
+            </div>
           </motion.div>
 
           {/* Progress bar */}
@@ -147,7 +196,7 @@ const AnswerSubmission = () => {
                 {currentQuestion + 1} / {room.questions.length}
               </span>
               <span className="font-pixel text-[8px] text-accent">
-                {Math.round(progress)}% complete
+                {Math.round(progress)}% 완료
               </span>
             </div>
           </div>
@@ -170,7 +219,7 @@ const AnswerSubmission = () => {
             </div>
             
             <PixelTextarea
-              placeholder="Type your answer here..."
+              placeholder="여기에 답변을 입력하세요..."
               value={answers[question.id] || ''}
               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
               rows={4}
@@ -185,7 +234,7 @@ const AnswerSubmission = () => {
               disabled={currentQuestion === 0}
               className="flex-1"
             >
-              Previous
+              이전
             </PixelButton>
             
             {currentQuestion < room.questions.length - 1 ? (
@@ -194,17 +243,18 @@ const AnswerSubmission = () => {
                 onClick={nextQuestion}
                 className="flex-1"
               >
-                Next
+                다음
               </PixelButton>
             ) : (
               <PixelButton
                 variant="accent"
                 onClick={handleSubmit}
+                disabled={isSubmitting}
                 className="flex-1"
               >
                 <span className="flex items-center justify-center gap-2">
                   <Send className="w-4 h-4" />
-                  Submit
+                  {isSubmitting ? '제출 중...' : '제출하기'}
                 </span>
               </PixelButton>
             )}

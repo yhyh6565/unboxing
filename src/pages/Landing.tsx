@@ -40,7 +40,7 @@ const Landing = () => {
           className="text-center mb-8"
         >
           <h1 className="font-pixel text-3xl sm:text-5xl md:text-6xl text-foreground pixel-text-shadow mb-4">
-            UNBOX US
+            언박스 어스
           </h1>
           <motion.div
             className="w-48 h-2 bg-accent mx-auto"
@@ -60,19 +60,19 @@ const Landing = () => {
           <div className="flex items-start gap-3 mb-4">
             <div className="w-4 h-4 bg-accent flex-shrink-0 mt-1" />
             <p className="font-pixel text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
-              Answer anonymously now.
+              지금 익명으로 답변하세요.
             </p>
           </div>
           <div className="flex items-start gap-3 mb-4">
             <div className="w-4 h-4 bg-secondary flex-shrink-0 mt-1" />
             <p className="font-pixel text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
-              We'll unbox (reveal) the writers together at the party!
+              파티에서 다 같이 작성자를 공개해요!
             </p>
           </div>
           <div className="flex items-start gap-3">
             <div className="w-4 h-4 bg-primary flex-shrink-0 mt-1" />
             <p className="font-pixel text-[10px] sm:text-xs leading-relaxed text-muted-foreground">
-              Be honest and fun. 🎁
+              솔직하고 재미있게! 🎁
             </p>
           </div>
         </motion.div>
@@ -91,7 +91,7 @@ const Landing = () => {
           >
             <span className="flex items-center gap-2">
               <Gift className="w-4 h-4" />
-              Create Room
+              방 만들기
             </span>
           </PixelButton>
           
@@ -102,7 +102,7 @@ const Landing = () => {
           >
             <span className="flex items-center gap-2">
               <Users className="w-4 h-4" />
-              Join Room
+              방 참여하기
             </span>
           </PixelButton>
         </motion.div>
