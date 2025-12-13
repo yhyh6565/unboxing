@@ -39,8 +39,8 @@ const Landing = () => {
           transition={{ duration: 0.8, type: 'spring' }}
           className="text-center mb-8"
         >
-          <h1 className="font-pixel text-3xl sm:text-5xl md:text-6xl text-foreground pixel-text-shadow mb-4">
-            언박스 어스
+          <h1 className="font-dnf text-4xl sm:text-6xl md:text-7xl text-foreground pixel-text-shadow mb-4">
+            Unboxing
           </h1>
           <motion.div
             className="w-48 h-2 bg-accent mx-auto"
