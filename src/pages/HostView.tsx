@@ -93,16 +93,34 @@ const HostView = () => {
       }
     }
   };
-
   const handleReveal = async (answerId: string) => {
-    const success = await revealAnswer(answerId);
-    if (success) {
+    const answer = room?.answers.find(a => a.id === answerId);
+    if (!answer) return;
+
+    // Toggle reveal state
+    const newRevealState = !answer.is_revealed;
+    
+    if (newRevealState) {
+      const success = await revealAnswer(answerId);
+      if (success) {
+        setRoom(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            answers: prev.answers.map(a => 
+              a.id === answerId ? { ...a, is_revealed: true } : a
+            ),
+          };
+        });
+      }
+    } else {
+      // Just toggle locally (flip back to gift box)
       setRoom(prev => {
         if (!prev) return null;
         return {
           ...prev,
           answers: prev.answers.map(a => 
-            a.id === answerId ? { ...a, is_revealed: true } : a
+            a.id === answerId ? { ...a, is_revealed: false } : a
           ),
         };
       });
