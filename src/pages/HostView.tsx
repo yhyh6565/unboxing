@@ -373,8 +373,8 @@ const HostView = () => {
 
             {/* Gift Boxes / Answers */}
             <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
-              <AnimatePresence mode="wait">
-                {currentAnswers.map((answer, index) => (
+            <AnimatePresence>
+              {currentAnswers.map((answer, index) => (
                   <GiftBox
                     key={answer.id}
                     theme={room.theme as 'christmas' | 'horse'}
