@@ -35,6 +35,7 @@ export interface AnswerData {
   text: string;
   author_nickname: string;
   is_revealed: boolean;
+  created_at?: string;
 }
 
 export interface FullRoom extends RoomData {
@@ -109,7 +110,8 @@ export const getRoomByCode = async (code: string): Promise<FullRoom | null> => {
   const { data: answers } = await supabase
     .from('answers')
     .select('*')
-    .eq('room_id', room.id);
+    .eq('room_id', room.id)
+    .order('created_at', { ascending: true });
 
   return {
     ...room,
@@ -137,7 +139,8 @@ export const getRoomById = async (id: string): Promise<FullRoom | null> => {
   const { data: answers } = await supabase
     .from('answers')
     .select('*')
-    .eq('room_id', room.id);
+    .eq('room_id', room.id)
+    .order('created_at', { ascending: true });
 
   return {
     ...room,
@@ -201,7 +204,7 @@ export const getUniqueParticipantsCount = async (roomId: string): Promise<number
     .eq('room_id', roomId);
 
   if (!data) return 0;
-  
+
   const uniqueNames = new Set(data.map((a) => a.author_nickname));
   return uniqueNames.size;
 };
@@ -225,7 +228,8 @@ export const subscribeToAnswers = (
         const { data } = await supabase
           .from('answers')
           .select('*')
-          .eq('room_id', roomId);
+          .eq('room_id', roomId)
+          .order('created_at', { ascending: true });
         callback(data || []);
       }
     )
