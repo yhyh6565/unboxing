@@ -373,20 +373,18 @@ const HostView = () => {
 
             {/* Gift Boxes / Answers */}
             <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
-            <AnimatePresence>
               {currentAnswers.map((answer, index) => (
-                  <GiftBox
-                    key={answer.id}
-                    theme={room.theme as 'christmas' | 'horse'}
-                    isRevealed={answer.is_revealed}
-                    answerText={answer.text}
-                    authorName={answer.author_nickname}
-                    showAuthor={showAuthors}
-                    onClick={() => handleReveal(answer.id)}
-                    index={index}
-                  />
-                ))}
-              </AnimatePresence>
+                <GiftBox
+                  key={answer.id}
+                  theme={room.theme as 'christmas' | 'horse'}
+                  isRevealed={answer.is_revealed}
+                  answerText={answer.text}
+                  authorName={answer.author_nickname}
+                  showAuthor={showAuthors}
+                  onClick={() => handleReveal(answer.id)}
+                  index={index}
+                />
+              ))}
 
               {currentAnswers.length === 0 && (
                 <div className="text-sm text-muted-foreground">
