@@ -27,8 +27,8 @@ const JoinRoom = () => {
       return;
     }
 
-    // 결과 페이지로 이동
-    navigate(`/results/${room.id}`);
+    // 언박싱 페이지로 이동
+    navigate(`/host/${room.id}`);
   };
 
   return (
