@@ -6,27 +6,6 @@ export interface Question {
   isCustom: boolean;
 }
 
-export interface Answer {
-  id: string;
-  questionId: string;
-  text: string;
-  authorNickname: string;
-  isRevealed: boolean;
-}
-
-export interface Room {
-  id: string;
-  name: string;
-  code: string;
-  theme: Theme;
-  participantCount: number;
-  questions: Question[];
-  answers: Answer[];
-  status: 'collecting' | 'unboxing' | 'completed';
-  currentQuestionIndex: number;
-  createdAt: number;
-}
-
 export interface Participant {
   nickname: string;
   roomCode: string;
