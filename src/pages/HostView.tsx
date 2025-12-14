@@ -418,6 +418,8 @@ const HostView = () => {
             questionCount={room.questions.length}
             answerCount={room.answers.length}
             theme={room.theme as 'christmas' | 'horse'}
+            questions={room.questions}
+            answers={room.answers}
             onDownloadPDF={handleDownloadPDF}
             onBackToQuestions={() => setShowVictory(false)}
           />
