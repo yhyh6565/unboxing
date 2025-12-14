@@ -1,27 +1,20 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, LogIn } from 'lucide-react';
+import { ArrowLeft, DoorOpen } from 'lucide-react';
 import PixelButton from '@/components/PixelButton';
 import PixelInput from '@/components/PixelInput';
 import { getRoomByCode } from '@/lib/supabase-storage';
-import { saveParticipant } from '@/lib/storage';
 import { toast } from 'sonner';
 
 const JoinRoom = () => {
   const navigate = useNavigate();
   const [roomCode, setRoomCode] = useState('');
-  const [nickname, setNickname] = useState('');
   const [isJoining, setIsJoining] = useState(false);
 
   const handleJoin = async () => {
     if (!roomCode.trim()) {
       toast.error('방 코드를 입력해주세요');
-      return;
-    }
-
-    if (!nickname.trim()) {
-      toast.error('닉네임을 입력해주세요');
       return;
     }
 
@@ -34,18 +27,8 @@ const JoinRoom = () => {
       return;
     }
 
-    if (room.status !== 'collecting') {
-      toast.error('이 방은 더 이상 답변을 받지 않아요');
-      return;
-    }
-
-    saveParticipant({
-      nickname: nickname.trim(),
-      roomCode: room.code,
-      hasSubmitted: false,
-    });
-
-    navigate(`/answer/${room.code}`);
+    // 결과 페이지로 이동
+    navigate(`/results/${room.id}`);
   };
 
   return (
@@ -86,17 +69,8 @@ const JoinRoom = () => {
                 maxLength={6}
                 className="text-center tracking-widest text-lg"
               />
-            </div>
-
-            <div>
-              <PixelInput
-                label="닉네임"
-                placeholder="익명의 영웅"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-              />
               <p className="text-xs text-muted-foreground mt-2">
-                이 이름은 답변 공개 시 함께 보여져요!
+                모임 주최자에게 방 코드를 받으세요
               </p>
             </div>
 
@@ -108,8 +82,8 @@ const JoinRoom = () => {
               className="w-full"
             >
               <span className="flex items-center justify-center gap-2">
-                <LogIn className="w-4 h-4" />
-                {isJoining ? '참여 중...' : '입장하기'}
+                <DoorOpen className="w-4 h-4" />
+                {isJoining ? '입장 중...' : '입장하기'}
               </span>
             </PixelButton>
           </motion.div>
@@ -122,7 +96,7 @@ const JoinRoom = () => {
             className="mt-8 text-center"
           >
             <p className="text-sm text-muted-foreground">
-              방 코드는 주최자에게 물어보세요 🎁
+              모임 당일, 다 같이 결과를 확인해보세요! 🎉
             </p>
           </motion.div>
         </div>
