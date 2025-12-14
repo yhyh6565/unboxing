@@ -47,9 +47,7 @@ const GiftBox = ({
   return (
     <motion.div
       className="relative cursor-pointer w-40 h-40 sm:w-48 sm:h-48"
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: index * 0.1, type: 'spring', stiffness: 200 }}
+      initial={false}
       style={{ perspective: 1000 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
