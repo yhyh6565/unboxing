@@ -372,22 +372,26 @@ const HostView = () => {
             </div>
 
             {/* Gift Boxes / Answers */}
-            <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
-              {currentAnswers.map((answer, index) => (
-                <GiftBox
-                  key={answer.id}
-                  theme={room.theme as 'christmas' | 'horse'}
-                  isRevealed={answer.is_revealed}
-                  answerText={answer.text}
-                  authorName={answer.author_nickname}
-                  showAuthor={showAuthors}
-                  onClick={() => handleReveal(answer.id)}
-                  index={index}
-                />
-              ))}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8 justify-items-center">
+              {currentAnswers
+                .slice()
+                .sort((a, b) => a.id.localeCompare(b.id))
+                .map((answer, index) => (
+                  <div key={answer.id} className="flex justify-center">
+                    <GiftBox
+                      theme={room.theme as 'christmas' | 'horse'}
+                      isRevealed={answer.is_revealed}
+                      answerText={answer.text}
+                      authorName={answer.author_nickname}
+                      showAuthor={showAuthors}
+                      onClick={() => handleReveal(answer.id)}
+                      index={index}
+                    />
+                  </div>
+                ))}
 
               {currentAnswers.length === 0 && (
-                <div className="text-sm text-muted-foreground">
+                <div className="col-span-full text-sm text-muted-foreground text-center">
                   이 질문에 대한 답변이 아직 없어요
                 </div>
               )}
